@@ -1,0 +1,35 @@
+category,artifact_path,generator_or_source,exists,size_bytes,purpose
+paper,paper/ieee_submission.tex,manual manuscript source,True,71943,Main revised manuscript source.
+paper,paper/ieee_submission.pdf,pdflatex/bibtex build,True,3948599,Locally compiled clean manuscript PDF.
+paper,paper/response_to_reviewers_draft.md,manual response draft,True,17205,Draft response-to-reviewers source.
+paper,paper/revision_handoff_notes.md,manual handoff notes,True,10983,Current technical handoff for the next agent/author.
+reviewer,results/prior_work_positioning.csv,scripts/run_reviewer_revision_evidence.py,True,1288,Novelty and prior-work positioning table.
+reviewer,results/external_dataset_audit.csv,scripts/run_reviewer_revision_evidence.py,True,5921,Major public external-city dataset audit.
+reviewer,results/proxy_role_distribution_summary.csv,scripts/run_reviewer_revision_evidence.py,True,448,Proxy driver/rider retained-count and distance summary.
+reviewer,results/proxy_threshold_sensitivity.csv,scripts/run_reviewer_revision_evidence.py,True,798,Observable proxy-threshold sensitivity audit.
+reviewer,results/reviewer_feature_dictionary.csv,scripts/run_reviewer_revision_evidence.py,True,4946,Feature dictionary with availability and leakage status.
+reviewer,results/route_alternative_overlap_summary.csv,scripts/run_reviewer_revision_evidence.py,True,9447,OSRM alternative overlap and default-route comparison evidence.
+reviewer,results/eligibility_rule_ablation.csv,scripts/run_reviewer_revision_evidence.py,True,15034,Pickup/drop-off eligibility-rule ablation.
+reviewer,results/greedy_vs_optimal_assignment.csv,scripts/run_reviewer_revision_evidence.py,True,5272,Greedy seat-fill versus exhaustive small-batch assignment.
+reviewer,results/end_to_end_runtime_profile.csv,scripts/run_reviewer_revision_evidence.py,True,477,Cached route lookup/corridor/filter/matching timing.
+reviewer,results/runtime_resource_summary.csv,scripts/build_runtime_resource_summary.py,True,505,Route-cache storage and single-lookup memory-footprint summary.
+reviewer,results/stronger_dispatch_baselines.csv,scripts/run_stronger_dispatch_baselines.py,True,529,Greedy nearest-route and batch bipartite dispatch diagnostics.
+reviewer,results/osrm_live_latency_probe.csv,scripts/profile_osrm_live_latency.py,True,253,Live public OSRM route-fetch latency probe summary.
+reviewer,results/osrm_live_latency_probe_raw.csv,scripts/profile_osrm_live_latency.py,True,495,Live public OSRM route-fetch latency raw rows.
+reviewer,results/model_policy_diagnostic.csv,scripts/run_model_policy_diagnostic.py,True,1607,Cached route-policy comparison across model families.
+reviewer,results/model_policy_diagnostic_dataset.csv,scripts/run_model_policy_diagnostic.py,True,149615,Held-out cached route-policy diagnostic dataset.
+reviewer,results/validation_heuristic_selection.csv,scripts/run_validation_heuristic_selection.py,True,1134,March validation-selected non-ML heuristic summary.
+reviewer,results/validation_heuristic_selection_raw.csv,scripts/run_validation_heuristic_selection.py,True,7368,Raw March validation heuristic rows.
+reviewer,results/retained_density_sensitivity.csv,scripts/build_retained_density_sensitivity.py,True,2280,Retained-rider density sensitivity over the fixed 25% sample.
+reviewer,results/dispatch_corridor_sensitivity.csv,scripts/run_dispatch_corridor_sensitivity.py,True,4273,Cached dispatch-level H3/k-ring/densification diagnostic.
+reviewer,results/path_buffer_single_driver_summary.csv,scripts/run_path_buffer_baseline.py,True,392,Path-buffer single-driver comparator.
+reviewer,results/path_buffer_dispatch_summary.csv,scripts/run_path_buffer_baseline.py,True,269,Path-buffer dispatch comparator summary.
+reviewer,results/path_buffer_baseline_comparison.csv,scripts/run_path_buffer_baseline.py,True,1166,1000-driver live-or-cached path-buffer comparison.
+reviewer,results/path_buffer_baseline_config.json,scripts/run_path_buffer_baseline.py,True,935,Path-buffer rerun configuration.
+reviewer,results/dispatch_policy_gap_summary.csv,scripts/build_dispatch_policy_gap_summary.py,True,4082,Seed-level dispatch policy-gap summary.
+reviewer,results/dispatch_uncertainty_summary.csv,scripts/build_dispatch_uncertainty_summary.py,True,29834,Dispatch CI-width audit across headline and density-sweep metrics.
+reviewer,results/reviewer_response_matrix.csv,scripts/build_reviewer_response_matrix.py,True,20073,One-row-per-comment reviewer response coverage matrix.
+reviewer,results/reviewer_response_traceability.csv,scripts/audit_reviewer_response_traceability.py,True,7224,Checks that response-matrix artifact and table references resolve.
+reviewer,results/revision_package_audit.csv,scripts/audit_revision_package.py,True,5309,Review-facing artifact package audit.
+figure,paper/figures/paper_fig5a_gain_composition.png,visualizations/plot_paper_figures.py,True,126678,Split Figure 5 gain-composition panel.
+figure,paper/figures/paper_fig5b_residual_ml_lift.png,visualizations/plot_paper_figures.py,True,98850,Split Figure 5 residual-ML-lift panel.

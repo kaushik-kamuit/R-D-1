@@ -41,11 +41,10 @@ PAPER_FIG_DIR = ROOT / "paper" / "figures"
 OSRM_BASE_URL = os.environ.get("OSRM_BASE_URL", "https://router.project-osrm.org").rstrip("/")
 TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 TILE_SIZE = 256
-ZOOM = 13
-PADDING_PX = 90
-FOOTER_H = 118
-
-
+ZOOM = 14
+PADDING_LEFT_PX = 66
+PADDING_RIGHT_PX = 42
+PADDING_Y_PX = 66
 @dataclass(frozen=True, slots=True)
 class RouteStyle:
     label: str
@@ -131,10 +130,10 @@ def _compute_canvas_bounds(route_polylines: list[list[LatLng]], corridor_cells: 
             xs.append(x)
             ys.append(y)
     return (
-        math.floor(min(xs) - PADDING_PX),
-        math.floor(min(ys) - PADDING_PX),
-        math.ceil(max(xs) + PADDING_PX),
-        math.ceil(max(ys) + PADDING_PX),
+        math.floor(min(xs) - PADDING_LEFT_PX),
+        math.floor(min(ys) - PADDING_Y_PX),
+        math.ceil(max(xs) + PADDING_RIGHT_PX),
+        math.ceil(max(ys) + PADDING_Y_PX),
     )
 
 
@@ -194,7 +193,7 @@ def _rounded_label(
 
 
 def _draw_origin_destination(draw: ImageDraw.ImageDraw, world_x0: int, world_y0: int) -> None:
-    label_font = _font(15, bold=True)
+    label_font = _font(40, bold=True)
     specs = [
         ("Origin", ORIGIN, (37, 37, 37), (-78, -14)),
         ("Destination", DESTINATION, (37, 37, 37), (-38, -34)),
@@ -218,7 +217,7 @@ def _draw_route_tag(
     style: RouteStyle,
     offset: tuple[int, int],
 ) -> None:
-    font = _font(15, bold=True)
+    font = _font(40, bold=True)
     lat, lng = _route_midpoint(polyline)
     x, y = _to_local_px(lat, lng, world_x0, world_y0)
     _rounded_label(draw, (x + offset[0], y + offset[1]), style.label, font, style.color)
@@ -264,33 +263,6 @@ def _legend_row(draw: ImageDraw.ImageDraw, x: int, y: int, style: RouteStyle, fo
     draw.text((x + 58, y), style.label, fill=(32, 32, 32), font=font)
 
 
-def _compose_final(map_img: Image.Image) -> Image.Image:
-    width, height = map_img.size
-    canvas = Image.new("RGB", (width, height + FOOTER_H), "white")
-    canvas.paste(map_img.convert("RGB"), (0, 0))
-    draw = ImageDraw.Draw(canvas)
-
-    title_font = _font(16, bold=True)
-    body_font = _font(14, bold=False)
-    body_bold = _font(14, bold=True)
-
-    draw.line((0, height, width, height), fill=(221, 221, 221), width=1)
-    draw.text((28, height + 14), "Three illustrative route corridors", fill=(25, 25, 25), font=title_font)
-
-    legend_y = height + 42
-    margin = 28
-    gap = 18
-    col_w = (width - 2 * margin - 2 * gap) // 3
-    for i, style in enumerate(ROUTES):
-        x = margin + i * (col_w + gap)
-        _legend_row(draw, x, legend_y, style, body_font)
-
-    draw.ellipse((28, height + 88, 40, height + 100), fill=(35, 35, 35))
-    draw.text((48, height + 84), "Origin / destination markers", fill=(50, 50, 50), font=body_font)
-    draw.text((width - 275, height + 84), "H3 resolution 9, k=1 expansion", fill=(50, 50, 50), font=body_bold)
-    return canvas
-
-
 def _save(image: Image.Image, name: str) -> None:
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     PAPER_FIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -298,10 +270,10 @@ def _save(image: Image.Image, name: str) -> None:
     jpg_plot = PLOTS_DIR / f"{name}.jpg"
     png_paper = PAPER_FIG_DIR / f"{name}.png"
     jpg_paper = PAPER_FIG_DIR / f"{name}.jpg"
-    image.save(png_plot)
-    image.save(jpg_plot, quality=95)
-    image.save(png_paper)
-    image.save(jpg_paper, quality=95)
+    image.save(png_plot, dpi=(500, 500))
+    image.save(jpg_plot, quality=95, dpi=(500, 500))
+    image.save(png_paper, dpi=(500, 500))
+    image.save(jpg_paper, quality=95, dpi=(500, 500))
     print(f"  [Saved] {png_plot}")
     print(f"  [Saved] {png_paper}")
 
@@ -321,8 +293,8 @@ def main() -> None:
     basemap.info["world_x0"] = world_x0
     basemap.info["world_y0"] = world_y0
     with_corridors = _draw_corridors(basemap, route_polylines, corridor_cells)
-    final = _compose_final(with_corridors)
-    _save(final, "paper_fig2a_corridor_map")
+    _save(with_corridors.convert("RGB"), "paper_fig2a_corridor_map")
+    _save(with_corridors.convert("RGB"), "paper_fig2a_corridor_map_panel")
 
 
 if __name__ == "__main__":

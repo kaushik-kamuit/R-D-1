@@ -464,6 +464,14 @@ def write_comparison(
                 ]
                 best_policy = ref.iloc[0]["policy"] if not ref.empty else None
                 best_profit = float(ref.iloc[0]["profit_per_launched_driver_mean"]) if not ref.empty else None
+            note = (
+                "Path-buffer rerun uses the same public Yellow assets with live-or-cached OSRM routes; "
+                "paper-best heuristic values come from the validated full paper summaries."
+                if sample_scope == "live_or_cached_routes"
+                else
+                "Path-buffer rerun uses the same public Yellow assets but a cache-constrained driver subset; "
+                "paper-best heuristic values come from the validated full paper summaries."
+            )
             comparison_rows.append(
                 {
                     "mode": mode,
@@ -481,10 +489,7 @@ def write_comparison(
                     ),
                     "driver_sample_size": int(path_buffer.iloc[0]["driver_sample_size"]) if not path_buffer.empty else int(cold.iloc[0]["driver_sample_size"]),
                     "n_seeds": int(path_buffer.iloc[0]["n_seeds"]) if not path_buffer.empty else int(cold.iloc[0]["n_seeds"]),
-                    "comparison_note": (
-                        "Path-buffer rerun uses the same public Yellow assets but a cache-constrained driver subset; "
-                        "paper-best heuristic values come from the validated full paper summaries."
-                    ),
+                    "comparison_note": note,
                 }
             )
     out_path = RESULTS_DIR / "path_buffer_baseline_comparison.csv"

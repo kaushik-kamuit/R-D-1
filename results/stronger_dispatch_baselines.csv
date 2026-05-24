@@ -1,0 +1,3 @@
+baseline,drivers_evaluated,profit_per_driver,matched_riders_per_driver,served_riders,sample_scope,density_pct,seed,driver_sample_size,note
+greedy_nearest_route_dispatch,100,-7.608842214820982,0.28,28,cached_multiroute_april_yellow,10,42,100,Reviewer diagnostic baseline on cached multi-route subset; not a full production RTV solver.
+batch_bipartite_single_rider,100,-8.58566860949209,0.05,5,cached_multiroute_april_yellow,10,42,100,Reviewer diagnostic baseline on cached multi-route subset; not a full production RTV solver.

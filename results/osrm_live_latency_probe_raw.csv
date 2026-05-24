@@ -1,0 +1,6 @@
+driver_id,ok,route_count,latency_s,error,note
+0,True,2,1.2393496000440791,,Tiny public OSRM probe; not a production latency guarantee.
+1,True,2,1.788500600028783,,Tiny public OSRM probe; not a production latency guarantee.
+2,True,1,1.773826599936001,,Tiny public OSRM probe; not a production latency guarantee.
+3,True,2,1.7934764999663457,,Tiny public OSRM probe; not a production latency guarantee.
+4,True,1,1.7832472999580204,,Tiny public OSRM probe; not a production latency guarantee.

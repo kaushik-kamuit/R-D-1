@@ -96,7 +96,7 @@ The density-response figure is the clearest single system-level result for the l
 
 Across retained-sample densities, route-aware policies consistently improve on cold-start. The strongest heuristic captures most of the gain, while ML warm-up preserves a smaller residual edge.
 
-Additional figures, including cross-domain comparison, model support, and sensitivity analysis, are kept in the manuscript package under `paper/figures/` and the checked-in plot directory under `results/plots/`.
+Additional figures, including the same-city Yellow--Green service-type comparison, model support, and sensitivity analysis, are kept in the manuscript package under `paper/figures/` and the checked-in plot directory under `results/plots/`.
 
 ## Repository Layout
 

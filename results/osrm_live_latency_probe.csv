@@ -1,0 +1,2 @@
+requests,mean_latency_s,median_latency_s,max_latency_s,mean_route_count,sample,seed,note
+5,1.6756801199866458,1.7832472999580204,1.7934764999663457,1.6,5,2026,Public OSRM live route-fetch probe; cached online dispatch timings are reported separately.

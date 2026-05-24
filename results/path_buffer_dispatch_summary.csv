@@ -1,0 +1,3 @@
+mode,density_pct,policy,profit_per_driver,matched_riders_per_driver,match_rate,driver_sample_size,n_seeds
+dispatch,10,coldstart,-8.248991340549543,0.122,0.044213631569982564,1000,5
+dispatch,10,heuristic_path_buffer,-8.072215154038302,0.156,0.0565354633189941,1000,5

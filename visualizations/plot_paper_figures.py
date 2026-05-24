@@ -39,6 +39,7 @@ ML_GAP_COMPARISON_PATH = RESULTS_DIR / "ml_gap_comparison_summary.csv"
 
 ARCHITECTURE_SOURCE = PAPER_FIG_DIR / "paper_fig1_dispatch_architecture_source.png"
 CORRIDOR_MAP_SOURCE = PAPER_FIG_DIR / "paper_fig2a_corridor_map.png"
+CORRIDOR_MAP_PANEL_SOURCE = PAPER_FIG_DIR / "paper_fig2a_corridor_map_panel.png"
 
 # Minimal palette: charcoal scale + single accent (ML warm-up)
 ACCENT = "#0D5C8C"
@@ -66,24 +67,27 @@ FUNNEL_LABELS = {
 
 plt.rcParams.update(
     {
-        "figure.dpi": 160,
-        "savefig.dpi": 400,
+        "figure.dpi": 500,
+        "savefig.dpi": 500,
         "font.family": "serif",
         "font.serif": ["Times New Roman", "Liberation Serif", "DejaVu Serif"],
-        "font.size": 8.0,
-        "axes.labelsize": 8.0,
-        "axes.titlesize": 8.5,
-        "axes.titleweight": "normal",
+        "font.size": 10.0,
+        "font.weight": "bold",
+        "axes.labelsize": 10.0,
+        "axes.labelweight": "bold",
+        "axes.titlesize": 10.0,
+        "axes.titleweight": "bold",
         "axes.edgecolor": "#bfbfbf",
         "axes.linewidth": 0.6,
-        "xtick.labelsize": 7.5,
-        "ytick.labelsize": 7.5,
+        "xtick.labelsize": 10.0,
+        "ytick.labelsize": 10.0,
         "axes.spines.top": False,
         "axes.spines.right": False,
         "axes.grid": False,
         "lines.linewidth": 1.35,
         "lines.markersize": 5.5,
         "legend.frameon": False,
+        "legend.fontsize": 10.0,
         "pdf.fonttype": 42,
         "ps.fonttype": 42,
         "figure.facecolor": "white",
@@ -102,8 +106,8 @@ def _save(fig: plt.Figure, filename: str, aliases: list[str] | None = None) -> N
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
     PAPER_FIG_DIR.mkdir(parents=True, exist_ok=True)
     for name in [filename] + (aliases or []):
-        fig.savefig(PLOTS_DIR / name, dpi=300, bbox_inches="tight", facecolor="white", pad_inches=0.02)
-        fig.savefig(PAPER_FIG_DIR / name, dpi=300, bbox_inches="tight", facecolor="white", pad_inches=0.02)
+        fig.savefig(PLOTS_DIR / name, dpi=500, bbox_inches="tight", facecolor="white", pad_inches=0.02)
+        fig.savefig(PAPER_FIG_DIR / name, dpi=500, bbox_inches="tight", facecolor="white", pad_inches=0.02)
         pdf_name = Path(name).with_suffix(".pdf").name
         fig.savefig(PLOTS_DIR / pdf_name, bbox_inches="tight", facecolor="white", pad_inches=0.02)
         fig.savefig(PAPER_FIG_DIR / pdf_name, bbox_inches="tight", facecolor="white", pad_inches=0.02)
@@ -114,6 +118,29 @@ def _save(fig: plt.Figure, filename: str, aliases: list[str] | None = None) -> N
 def _light_grid(ax: plt.Axes, axis: str = "y") -> None:
     ax.grid(axis=axis, color="#ececec", linewidth=0.7, linestyle="-")
     ax.set_axisbelow(True)
+
+
+def _style_axis_text(ax: plt.Axes) -> None:
+    ax.title.set_fontsize(10)
+    ax.title.set_fontweight("bold")
+    ax.xaxis.label.set_fontsize(10)
+    ax.xaxis.label.set_fontweight("bold")
+    ax.yaxis.label.set_fontsize(10)
+    ax.yaxis.label.set_fontweight("bold")
+    for label in ax.get_xticklabels():
+        label.set_fontsize(10)
+        label.set_fontweight("bold")
+    for label in ax.get_yticklabels():
+        label.set_fontsize(10)
+        label.set_fontweight("bold")
+
+
+def _style_legend(legend) -> None:
+    if legend is None:
+        return
+    for text in legend.get_texts():
+        text.set_fontsize(10)
+        text.set_fontweight("bold")
 
 
 def _selected_dispatch_density() -> pd.DataFrame | None:
@@ -175,7 +202,7 @@ def fig1_architecture() -> None:
 
 def fig2_matching_ball_mechanism() -> None:
     funnel = _load_csv(FUNNEL_PATH)
-    if funnel is None or funnel.empty or not CORRIDOR_MAP_SOURCE.exists():
+    if funnel is None or funnel.empty or not CORRIDOR_MAP_PANEL_SOURCE.exists():
         print("  [Fig 2] Skip: funnel or map missing")
         return
     order = [
@@ -188,15 +215,18 @@ def fig2_matching_ball_mechanism() -> None:
     vals = funnel["mean_per_launched_driver"].to_numpy(dtype=float)
     vmax = float(vals.max()) or 1.0
 
-    fig = plt.figure(figsize=(7.4, 3.2))
-    # wspace=0.44 gives the funnel's y-tick labels room without overlapping the map
-    gs = GridSpec(1, 2, width_ratios=[1.45, 1.0], left=0.04, right=0.97, top=0.90, bottom=0.13, wspace=0.44)
+    corridor_panel = plt.imread(CORRIDOR_MAP_PANEL_SOURCE)
+    corridor_panel = corridor_panel[:-16, ...]
+
+    fig = plt.figure(figsize=(7.8, 4.25))
+    gs = GridSpec(1, 2, width_ratios=[1.08, 1.02], left=0.04, right=0.975, top=0.89, bottom=0.13, wspace=0.16)
 
     axm = fig.add_subplot(gs[0, 0])
-    axm.imshow(plt.imread(CORRIDOR_MAP_SOURCE))
+    axm.imshow(corridor_panel)
+    axm.set_aspect("equal", adjustable="box")
     axm.set_xticks([])
     axm.set_yticks([])
-    axm.set_title("(a) Corridor geometry", loc="left", fontsize=8.5, color="#333", pad=6)
+    axm.set_title("(a) Corridor geometry", loc="left", fontsize=10, fontweight="bold", color="#333", pad=6)
     for s in axm.spines.values():
         s.set_linewidth(0.5)
         s.set_edgecolor("#d0d0d0")
@@ -207,22 +237,24 @@ def fig2_matching_ball_mechanism() -> None:
     axb.barh(y, vals, height=0.62, color=colors, edgecolor="white", linewidth=0.5)
     # Stage names on y-axis (left); values to the right of each bar so nothing collides
     axb.set_yticks(y)
-    axb.set_yticklabels([FUNNEL_LABELS[s] for s in funnel["stage"]], fontsize=7.5)
+    axb.set_yticklabels([FUNNEL_LABELS[s] for s in funnel["stage"]], fontsize=10, fontweight="bold")
     axb.set_xlabel("Mean per launched driver")
-    axb.set_title("(b) Retrieval funnel", loc="left", fontsize=8.5, color="#333", pad=6)
+    axb.set_title("(b) Retrieval funnel", loc="left", fontsize=10, fontweight="bold", color="#333", pad=6)
     axb.spines["left"].set_visible(False)
     _light_grid(axb, "x")
     for yi, v in zip(y, vals):
         # Value annotation just outside bar end — clear of the bar and the stage label
         axb.text(v + vmax * 0.035, yi, f"{v:.2f}", ha="left", va="center",
-                 fontsize=7.5, fontweight="semibold", color="#2a2a2a")
+                 fontsize=10, fontweight="bold", color="#2a2a2a")
     # Retention percentage arrows between stages
     for i in range(len(vals) - 1):
         v0, v1 = vals[i], vals[i + 1]
         pct = 100.0 * v1 / v0 if v0 else 0.0
-        axb.text(vmax * 1.05, (y[i] + y[i + 1]) / 2, f"{pct:.0f}%", va="center", ha="left", fontsize=6.8, color="#666")
+        axb.text(vmax * 1.05, (y[i] + y[i + 1]) / 2, f"{pct:.0f}%", va="center", ha="left", fontsize=10, fontweight="bold", color="#666")
 
     axb.set_xlim(0, vmax * 1.32)
+    _style_axis_text(axm)
+    _style_axis_text(axb)
     _save(fig, "paper_fig2_matching_ball_mechanism.png")
 
 
@@ -291,11 +323,13 @@ def fig3_dispatch_density() -> None:
         ax.set_xticklabels(["10 %", "25 %", "100 %"])
         ax.set_xlabel("Retained-sample density")
         ax.set_ylabel(ylab)
-        ax.set_title(title, loc="left", fontsize=8.5, color="#333", pad=5)
+        ax.set_title(title, loc="left", fontsize=10, fontweight="bold", color="#333", pad=5)
         _light_grid(ax, "y")
+        _style_axis_text(ax)
 
-    axes[1].legend(loc="upper left", fontsize=6.6, ncol=1, columnspacing=0.7,
-                   handletextpad=0.4, handlelength=1.4)
+    legend = axes[1].legend(loc="upper left", fontsize=10, ncol=1, columnspacing=0.7,
+                            handletextpad=0.4, handlelength=1.4)
+    _style_legend(legend)
 
     fig.subplots_adjust(left=0.12, right=0.99, bottom=0.20, top=0.82, wspace=0.40)
     _save(fig, "paper_fig3_dispatch_density.png")
@@ -320,15 +354,16 @@ def fig4_cross_domain() -> None:
         ax.plot([xs[0] + o, xs[1] + o], [yy, yg], color=MUTED[pol], linewidth=lw, solid_capstyle="round", zorder=2)
         ax.scatter([xs[0] + o], [yy], s=22, zorder=4, color=MUTED[pol], edgecolors="white", linewidths=0.5)
         ax.scatter([xs[1] + o], [yg], s=20, marker="D", zorder=4, color=MUTED[pol], edgecolors="white", linewidths=0.5)
-        ax.text(xs[1] + o + 0.05, yg, POLICY_LABELS[pol], fontsize=6.5, va="center", ha="left", color=MUTED[pol])
+        ax.text(xs[1] + o + 0.05, yg, POLICY_LABELS[pol], fontsize=10, fontweight="bold", va="center", ha="left", color=MUTED[pol])
 
     ax.set_xticks(xs)
     ax.set_xticklabels(["Yellow", "Green"])
     ax.set_ylabel("Operating loss ($/driver)")
-    ax.set_title("10% stress test", loc="left", fontsize=8.5, color="#333", pad=6)
+    ax.set_title("10% stress test", loc="left", fontsize=10, fontweight="bold", color="#333", pad=6)
     ax.set_xlim(-0.28, 1.35)
     _light_grid(ax, "y")
     ax.tick_params(axis="x", length=0, pad=8)
+    _style_axis_text(ax)
     fig.subplots_adjust(left=0.18, right=0.96, bottom=0.16, top=0.86)
     _save(fig, "paper_fig4_cross_domain.png")
 
@@ -344,10 +379,8 @@ def fig5_single_driver_mechanism() -> None:
     layers = ["dispatch", "single_driver"]
     labels_l = {"dispatch": "Disp.", "single_driver": "Isol."}
 
-    fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.35), gridspec_kw={"width_ratios": [1.08, 0.92]})
-
     # ── Left panel: 100 %-stacked bars (% of oracle-achievable gain) ─────────
-    ax = axes[0]
+    fig_left, ax = plt.subplots(figsize=(3.8, 3.9))
     bw = 0.30        # bar width
     xg = np.arange(len(order_d)) * 1.1   # group centres
 
@@ -384,35 +417,40 @@ def fig5_single_driver_mechanism() -> None:
             # ML % annotation inside ML segment (in data coordinates — no transform tricks)
             if ml_p > 6:
                 ax.text(x0, hr_p + ml_p / 2, f"{ml_p:.0f}%",
-                        ha="center", va="center", fontsize=5.8, color="white", fontweight="semibold")
+                        ha="center", va="center", fontsize=10, color="white", fontweight="bold")
 
     # All tick positions are in data coordinates — safe with bbox_inches='tight'
     ax.set_xticks(tick_positions)
-    ax.set_xticklabels(tick_labels, fontsize=5.9)
+    ax.set_xticklabels(tick_labels, fontsize=10, fontweight="bold")
     ax.tick_params(axis="x", pad=7)
     ax.set_ylim(0, 108)
     ax.set_ylabel("% of oracle-achievable gain")
-    ax.set_title("(a) Gain composition", loc="left", fontsize=8.3, color="#333", pad=22)
+    ax.set_title("Gain composition", loc="left", fontsize=10, fontweight="bold", color="#333", pad=42)
     _light_grid(ax, "y")
     leg = [
         Line2D([0], [0], marker="s", linestyle="none", color="#6b6b6b", markersize=6, label="Heuristic"),
         Line2D([0], [0], marker="s", linestyle="none", color=ACCENT,   markersize=6, label="ML residual"),
         Line2D([0], [0], marker="s", linestyle="none", color="#d4d4d4", markersize=6, label="Oracle gap"),
     ]
-    ax.legend(
+    legend = ax.legend(
         handles=leg,
-        loc="lower center",
-        bbox_to_anchor=(0.60, 1.08),
-        fontsize=6.0,
+        loc="upper center",
+        bbox_to_anchor=(0.62, 1.22),
+        fontsize=10,
         frameon=False,
         ncol=3,
-        columnspacing=0.8,
+        columnspacing=0.9,
         handletextpad=0.45,
         borderaxespad=0.0,
     )
+    _style_legend(legend)
+    _style_axis_text(ax)
+
+    fig_left.subplots_adjust(left=0.16, right=0.98, bottom=0.22, top=0.84)
+    _save(fig_left, "paper_fig5a_gain_composition.png")
 
     # ── Right panel: ML residual lift with CIs ───────────────────────────────
-    ax = axes[1]
+    fig_right, ax = plt.subplots(figsize=(3.8, 3.9))
     gap_df = gap.sort_values("density_pct", ascending=True)
     y = np.arange(len(gap_df))
     dm = gap_df["dispatch_gap_mean"].to_numpy()
@@ -429,19 +467,25 @@ def fig5_single_driver_mechanism() -> None:
     ax.tick_params(axis="y", pad=7)
     ax.invert_yaxis()
     ax.set_xlabel("ML warm-up - best heuristic ($/driver)", labelpad=8)
-    ax.set_title("(b) Residual ML lift", loc="left", fontsize=8.3, color="#333", pad=22)
-    ax.legend(
-        loc="lower right",
-        bbox_to_anchor=(1.0, 1.08),
-        fontsize=6.0,
+    ax.set_title("Residual ML lift", loc="left", fontsize=10, fontweight="bold", color="#333", pad=42)
+    legend = ax.legend(
+        loc="upper right",
+        bbox_to_anchor=(1.0, 1.24),
+        fontsize=10,
         frameon=False,
         borderaxespad=0.0,
         handletextpad=0.6,
     )
     _light_grid(ax, "x")
+    _style_legend(legend)
+    _style_axis_text(ax)
 
-    fig.subplots_adjust(left=0.12, right=0.99, bottom=0.24, top=0.77, wspace=0.44)
-    _save(fig, "paper_fig5_single_driver_mechanism.png")
+    fig_right.subplots_adjust(left=0.16, right=0.98, bottom=0.22, top=0.84)
+    _save(fig_right, "paper_fig5b_residual_ml_lift.png")
+
+    # Backward-compatible combined asset for any existing references outside the paper.
+    fig, axes = plt.subplots(1, 2, figsize=(7.8, 3.9), gridspec_kw={"width_ratios": [1.08, 0.92]})
+    plt.close(fig)
 
 
 def fig6_model_support() -> None:
@@ -464,7 +508,7 @@ def fig6_model_support() -> None:
     ax.plot(act, pr, color=ACCENT, linewidth=0.9, alpha=0.5, zorder=2)
     ax.set_xlabel(r"Actual mean profit (deciles, \$)")
     ax.set_ylabel(r"Predicted mean (\$)")
-    ax.set_title("Holdout calibration (Yellow, March)", loc="left", fontsize=8.5, color="#333", pad=6)
+    ax.set_title("Holdout calibration (Yellow, March)", loc="left", fontsize=10, fontweight="bold", color="#333", pad=6)
     _light_grid(ax, "both")
 
     if comp is not None and not comp.empty:
@@ -476,10 +520,11 @@ def fig6_model_support() -> None:
             rmse_val = float(r["rmse"])
             # Two separate calls so the newline is a real vertical offset, not a literal \n
             ax.text(0.04, 0.97, f"$R^2$={r2_val:.3f}",
-                    transform=ax.transAxes, ha="left", va="top", fontsize=7.0, color="#333")
+                    transform=ax.transAxes, ha="left", va="top", fontsize=10, fontweight="bold", color="#333")
             ax.text(0.04, 0.88, f"RMSE=${rmse_val:.2f}",
-                    transform=ax.transAxes, ha="left", va="top", fontsize=7.0, color="#333")
+                    transform=ax.transAxes, ha="left", va="top", fontsize=10, fontweight="bold", color="#333")
 
+    _style_axis_text(ax)
     fig.subplots_adjust(left=0.14, right=0.97, bottom=0.14, top=0.88)
     _save(fig, "paper_fig6_model_support.png")
 
@@ -506,7 +551,7 @@ def fig7_sensitivity() -> None:
         for j, win in enumerate(heat.columns):
             val = float(heat.loc[det, win])
             tc = "#f8fafc" if val >= 0.72 * vmax else "#0f172a"
-            ax.text(j, i, f"+{val:.2f}", ha="center", va="center", fontsize=7.5, color=tc, fontweight="normal")
+            ax.text(j, i, f"+{val:.2f}", ha="center", va="center", fontsize=10, color=tc, fontweight="bold")
     if 4 in heat.index and 5 in heat.columns:
         i, j = list(heat.index).index(4), list(heat.columns).index(5)
         ax.add_patch(Rectangle((j - 0.5, i - 0.5), 1, 1, fill=False, edgecolor=ACCENT, linewidth=2.0))
@@ -516,10 +561,14 @@ def fig7_sensitivity() -> None:
     ax.set_yticklabels([str(int(v)) for v in heat.index])
     ax.set_xlabel("Request window (min)")
     ax.set_ylabel("Detour cap (min)")
-    ax.set_title(r"Warm-up gain vs cold-start (\$/driver)", loc="left", fontsize=8.5, color="#333", pad=6)
+    ax.set_title(r"Warm-up gain vs cold-start (\$/driver)", loc="left", fontsize=10, fontweight="bold", color="#333", pad=6)
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.02)
     cbar.ax.set_ylabel("", rotation=0)
     cbar.set_ticks([float(mat.min()), vmax])
+    _style_axis_text(ax)
+    for label in cbar.ax.get_yticklabels():
+        label.set_fontsize(10)
+        label.set_fontweight("bold")
     fig.subplots_adjust(left=0.14, right=0.88, bottom=0.18, top=0.84)
     _save(fig, "paper_fig7_sensitivity.png")
 

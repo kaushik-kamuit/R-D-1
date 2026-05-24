@@ -12,6 +12,7 @@ The checks are intentionally lightweight and dependency-free:
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +53,10 @@ def fmt_pct(value: str | float, decimals: int = 1) -> str:
     return f"{float(value):.{decimals}f}"
 
 
+def fmt_ms(value: str | float) -> str:
+    return f"{float(value) * 1000:.1f}"
+
+
 def validate_realism_tables() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     primary_rows = load_csv(RESULTS / "realism_primary_summary.csv")
     window_rows = load_csv(RESULTS / "window_sensitivity.csv")
@@ -64,6 +69,107 @@ def validate_realism_tables() -> tuple[dict[str, str], dict[str, str], dict[str,
     scenario_rows = load_csv(RESULTS / "scenario_assumptions.csv")
     load_csv(RESULTS / "route_gain_decomposition_summary.csv")
     load_csv(RESULTS / "ml_gap_comparison_summary.csv")
+    validation_heuristic_rows = load_csv(RESULTS / "validation_heuristic_selection.csv")
+    retained_density_rows = load_csv(RESULTS / "retained_density_sensitivity.csv")
+    dispatch_corridor_rows = load_csv(RESULTS / "dispatch_corridor_sensitivity.csv")
+    feature_dictionary_rows = load_csv(RESULTS / "reviewer_feature_dictionary.csv")
+    path_buffer_rows = load_csv(RESULTS / "path_buffer_baseline_comparison.csv")
+    dispatch_gap_rows = load_csv(RESULTS / "dispatch_policy_gap_summary.csv")
+    dispatch_uncertainty_rows = load_csv(RESULTS / "dispatch_uncertainty_summary.csv")
+    response_matrix_rows = load_csv(RESULTS / "reviewer_response_matrix.csv")
+    response_traceability_rows = load_csv(RESULTS / "reviewer_response_traceability.csv")
+    package_audit_rows = load_csv(RESULTS / "revision_package_audit.csv")
+    artifact_manifest_rows = load_csv(RESULTS / "revision_artifact_manifest.csv")
+    external_audit_rows = load_csv(RESULTS / "external_dataset_audit.csv")
+    for reviewer_artifact in (
+        "prior_work_positioning.csv",
+        "proxy_role_distribution_summary.csv",
+        "proxy_threshold_sensitivity.csv",
+        "route_alternative_overlap_summary.csv",
+        "eligibility_rule_ablation.csv",
+        "greedy_vs_optimal_assignment.csv",
+        "end_to_end_runtime_profile.csv",
+        "runtime_resource_summary.csv",
+        "stronger_dispatch_baselines.csv",
+        "osrm_live_latency_probe.csv",
+        "osrm_live_latency_probe_raw.csv",
+        "model_policy_diagnostic.csv",
+        "model_policy_diagnostic_dataset.csv",
+        "validation_heuristic_selection_raw.csv",
+        "path_buffer_single_driver_summary.csv",
+        "path_buffer_dispatch_summary.csv",
+    ):
+        load_csv(RESULTS / reviewer_artifact)
+    retained_density_keys = {
+        (row["domain"], int(row["density_pct_of_retained_sample"]))
+        for row in retained_density_rows
+    }
+    expected_retained_density_keys = {
+        (domain, density) for domain in ("yellow", "green") for density in (10, 25, 100)
+    }
+    if retained_density_keys != expected_retained_density_keys:
+        fail(
+            "retained_density_sensitivity.csv should contain Yellow/Green rows for "
+            f"10, 25, and 100% retained density; found {sorted(retained_density_keys)}"
+        )
+    expected_feature_families = {
+        "Route geometry",
+        "Temporal context",
+        "Online corridor demand",
+        "Historical spatial demand",
+        "Landmark/cell context",
+    }
+    observed_feature_families = {row.get("feature_family", "") for row in feature_dictionary_rows}
+    if len(feature_dictionary_rows) != 38:
+        fail(f"reviewer_feature_dictionary.csv should list 38 features; found {len(feature_dictionary_rows)}")
+    if observed_feature_families != expected_feature_families:
+        fail(
+            "reviewer_feature_dictionary.csv should include manuscript feature families; "
+            f"found {sorted(observed_feature_families)}"
+        )
+    if any(row["uses_realized_test_outcome"] != "No" for row in feature_dictionary_rows):
+        fail("reviewer_feature_dictionary.csv should mark every feature as avoiding realized test outcomes")
+    for row in retained_density_rows:
+        if float(row["warmup_gain_vs_coldstart"]) <= 0:
+            fail("Retained-density sensitivity should preserve positive warm-up gain over cold-start")
+    manifest_paths = {row["artifact_path"] for row in artifact_manifest_rows}
+    for path in (
+        "results/reviewer_response_matrix.csv",
+        "results/revision_package_audit.csv",
+        "results/retained_density_sensitivity.csv",
+        "results/dispatch_policy_gap_summary.csv",
+        "results/dispatch_uncertainty_summary.csv",
+        "results/reviewer_response_traceability.csv",
+        "paper/response_to_reviewers_draft.md",
+    ):
+        if path not in manifest_paths:
+            fail(f"revision_artifact_manifest.csv should include {path}")
+    if any(row["exists"] != "True" for row in artifact_manifest_rows):
+        fail("revision_artifact_manifest.csv should mark every listed artifact present")
+    expected_audit_candidates = {
+        "Chicago Transportation Network Providers / Taxi",
+        "Porto Taxi Trajectories",
+        "Washington DC Taxi",
+        "NYC HVFHV / FHV",
+        "San Francisco municipal open-data portal",
+        "Los Angeles municipal open-data portal",
+        "Austin municipal open-data portal",
+        "Seattle municipal open-data portal",
+        "Toronto municipal open-data portal",
+        "Boston municipal open-data portal",
+        "Philadelphia municipal open-data portal",
+        "Dallas municipal open-data portal",
+        "Houston municipal open-data portal",
+    }
+    observed_audit_candidates = {row["candidate"] for row in external_audit_rows}
+    if observed_audit_candidates != expected_audit_candidates:
+        fail(
+            "external_dataset_audit.csv should preserve the expanded major-city audit; "
+            f"found {sorted(observed_audit_candidates)}"
+        )
+    path_buffer_config_path = RESULTS / "path_buffer_baseline_config.json"
+    require_file(path_buffer_config_path)
+    path_buffer_config = json.loads(path_buffer_config_path.read_text(encoding="utf-8"))
     require_file(RESULTS / "realism_summary.txt")
 
     observed_primary = {int(row["density_pct"]) for row in primary_rows}
@@ -119,6 +225,101 @@ def validate_realism_tables() -> tuple[dict[str, str], dict[str, str], dict[str,
                 f"Selected heuristic at {density}% should be {best['heuristic_strategy']} "
                 f"but found {selected[0]['heuristic_strategy']}"
             )
+
+    validation_selected = [
+        row for row in validation_heuristic_rows
+        if row.get("selected_on_validation") == "True"
+    ]
+    if len(validation_selected) != 1:
+        fail("validation_heuristic_selection.csv should mark exactly one validation-selected heuristic")
+    if validation_selected[0]["heuristic"] != "heuristic_fare_density":
+        fail(
+            "March validation probe should select heuristic_fare_density; "
+            f"found {validation_selected[0]['heuristic']}"
+        )
+    corridor_tags = {row["sensitivity_tag"] for row in dispatch_corridor_rows}
+    expected_corridor_tags = {
+        "primary_h3r9_k1_d80",
+        "coarse_h3r8_k1_d80",
+        "wide_h3r9_k2_d80",
+        "sparse_h3r9_k1_d160",
+    }
+    if corridor_tags != expected_corridor_tags:
+        fail(
+            "dispatch_corridor_sensitivity.csv should contain "
+            f"{sorted(expected_corridor_tags)}; found {sorted(corridor_tags)}"
+        )
+    dispatch_path_buffer = [
+        row for row in path_buffer_rows
+        if row["mode"] == "dispatch" and row["density_pct"] == "10"
+    ]
+    if not dispatch_path_buffer:
+        fail("path_buffer_baseline_comparison.csv must include the 10% dispatch path-buffer comparison")
+    dispatch_path_buffer_row = dispatch_path_buffer[0]
+    if int(dispatch_path_buffer_row["driver_sample_size"]) != 1000:
+        fail("Dispatch path-buffer baseline should use the 1000-driver headline scale")
+    if dispatch_path_buffer_row["sample_scope"] != "live_or_cached_routes":
+        fail("Dispatch path-buffer baseline should be regenerated with live_or_cached_routes scope")
+    if float(dispatch_path_buffer_row["path_buffer_delta_vs_coldstart"]) <= 0:
+        fail("Path-buffer dispatch baseline should improve over cold-start")
+    if float(dispatch_path_buffer_row["path_buffer_vs_best_heuristic"]) >= 0:
+        fail("Path-buffer dispatch baseline should remain below the matching-ball heuristic")
+    if int(path_buffer_config.get("driver_sample_size", 0)) != 1000:
+        fail("path_buffer_baseline_config.json should record the 1000-driver rerun")
+    gap_keys = {(row["domain"], row["comparison"]) for row in dispatch_gap_rows}
+    expected_gap_keys = {
+        (domain, comparison)
+        for domain in ("yellow", "green")
+        for comparison in (
+            "warmup_vs_coldstart",
+            "best_heuristic_vs_coldstart",
+            "warmup_vs_best_heuristic",
+            "oracle_vs_warmup",
+            "oracle_vs_coldstart",
+        )
+    }
+    if gap_keys != expected_gap_keys:
+        fail(
+            "dispatch_policy_gap_summary.csv should contain the complete Yellow/Green "
+            f"policy-gap grid; found {sorted(gap_keys)}"
+        )
+    yellow_warmup_gap = next(
+        row for row in dispatch_gap_rows
+        if row["domain"] == "yellow" and row["comparison"] == "warmup_vs_best_heuristic"
+    )
+    if abs(float(yellow_warmup_gap["delta_profit_per_driver"]) - 0.15) > 1e-9:
+        fail("Yellow ML-vs-best-heuristic dispatch gap should remain $0.15/driver")
+    if int(yellow_warmup_gap["driver_sample_size"]) != 1000 or int(yellow_warmup_gap["n_seeds"]) != 5:
+        fail("Dispatch policy-gap summary should use the 1000-driver, five-seed headline setup")
+    if len(dispatch_uncertainty_rows) < 200:
+        fail("dispatch_uncertainty_summary.csv should audit headline and density-sweep dispatch metrics")
+    if any(row["interval_collapsed"] != "True" for row in dispatch_uncertainty_rows):
+        fail("All current dispatch uncertainty intervals should collapse under the retained-sample protocol")
+    if len(response_matrix_rows) != 38:
+        fail(f"reviewer_response_matrix.csv should contain 38 reviewer-comment rows; found {len(response_matrix_rows)}")
+    if {row["status"] for row in response_matrix_rows} != {"addressed"}:
+        fail("reviewer_response_matrix.csv should mark every reviewer comment addressed")
+    unreferenced_response_rows = [
+        f"R{row['reviewer']}C{row['comment']}"
+        for row in response_matrix_rows
+        if not row["referenced_artifacts"].strip()
+    ]
+    if unreferenced_response_rows:
+        fail(f"Reviewer response rows lack artifact/table references: {unreferenced_response_rows}")
+    if any(row["exists_or_resolves"] != "True" for row in response_traceability_rows):
+        fail("reviewer_response_traceability.csv should resolve every referenced response artifact")
+    audit_by_artifact = {row["artifact"]: row for row in package_audit_rows}
+    for artifact in (
+        "compiled_pdf",
+        "response_draft",
+        "reviewer_response_matrix",
+        "reviewer_response_traceability",
+        "path_buffer_comparison",
+        "yellow_route_cache_entries",
+    ):
+        row = audit_by_artifact.get(artifact)
+        if row is None or row["status"] != "present":
+            fail(f"revision_package_audit.csv should mark {artifact} present")
 
     for density in (100, 25, 10):
         density_rows = sorted(
@@ -249,7 +450,8 @@ def validate_paper_package(
         "paper_fig2_matching_ball_mechanism.png",
         "paper_fig3_dispatch_density.png",
         # paper_fig4_cross_domain.png removed — data covered by Table tab:domain_transfer
-        "paper_fig5_single_driver_mechanism.png",
+        "paper_fig5a_gain_composition.png",
+        "paper_fig5b_residual_ml_lift.png",
         "paper_fig6_model_support.png",
         "paper_fig7_sensitivity.png",
     ):
@@ -258,9 +460,40 @@ def validate_paper_package(
 
     manuscript = PAPER.joinpath("ieee_submission.tex").read_text(encoding="utf-8")
     references = PAPER.joinpath("references.bib").read_text(encoding="utf-8")
+    runtime_rows = load_csv(RESULTS / "end_to_end_runtime_profile.csv")
+    runtime_resource_rows = load_csv(RESULTS / "runtime_resource_summary.csv")
+    osrm_rows = load_csv(RESULTS / "osrm_live_latency_probe.csv")
+    model_policy_rows = load_csv(RESULTS / "model_policy_diagnostic.csv")
+    stronger_baseline_rows = load_csv(RESULTS / "stronger_dispatch_baselines.csv")
+    path_buffer_rows = load_csv(RESULTS / "path_buffer_baseline_comparison.csv")
+    runtime_by_stat = {row["stat"]: row for row in runtime_rows}
+    for stat in ("mean", "median", "max"):
+        if stat not in runtime_by_stat:
+            fail(f"end_to_end_runtime_profile.csv is missing {stat} row")
+    mean_runtime = runtime_by_stat["mean"]
+    median_runtime = runtime_by_stat["median"]
+    max_runtime = runtime_by_stat["max"]
+    runtime_resource = runtime_resource_rows[0]
+    osrm = osrm_rows[0]
+    model_policy_by_name = {row["model"]: row for row in model_policy_rows}
+    stronger_baseline_by_name = {row["baseline"]: row for row in stronger_baseline_rows}
+    path_buffer_by_key = {(row["mode"], row["density_pct"]): row for row in path_buffer_rows}
+    for model_name in (
+        "Ridge",
+        "MLP",
+        "LightGBM baseline",
+        "LightGBM tuned",
+        "LambdaRank",
+    ):
+        if model_name not in model_policy_by_name:
+            fail(f"model_policy_diagnostic.csv is missing {model_name}")
+    for baseline_name in ("greedy_nearest_route_dispatch", "batch_bipartite_single_rider"):
+        if baseline_name not in stronger_baseline_by_name:
+            fail(f"stronger_dispatch_baselines.csv is missing {baseline_name}")
 
     required_snippets = [
         "rolling-horizon",
+        "\\title{Route-Aware Ride-Pooling Dispatch via",
         "dispatch simulator",
         "retained-sample",
         "25\\%",
@@ -274,6 +507,21 @@ def validate_paper_package(
         "not calibrated platform margins",
         "strongest non-ML heuristic",
         "feasible-rider count",
+        "validation-selected",
+        "fare-density",
+        "dispatch-level corridor diagnostic",
+        "tab:dispatch_corridor_sensitivity",
+        "1000 Yellow test drivers",
+        "path-buffer policy reduces loss from \\(\\$8.25\\) to \\(\\$8.07\\)",
+        "Yellow route cache used in the path-buffer comparison has 1000 route entries",
+        "mean cached route-scoring path of 13.1 ms",
+        "worst profiled path of 66.2 ms",
+        "resource audit reports",
+        "cache is not loaded wholesale into memory",
+        "seed-level dispatch policy-gap summary",
+        "dispatch CI-width audit",
+        "tab:dispatch_policy_gap",
+        "point estimates rather than broad inferential intervals",
         "request window",
         "detour",
         "platform share",
@@ -281,25 +529,37 @@ def validate_paper_package(
         "60-second",
         "NYC Green",
         "single-driver",
-        "secondary evidence",
+        "controlled single-driver analysis",
         "paper_fig1_dispatch_architecture_v2.png",
         "paper_fig2_matching_ball_mechanism.png",
         "paper_fig3_dispatch_density.png",
         # paper_fig4_cross_domain.png removed
-        "paper_fig5_single_driver_mechanism.png",
+        "paper_fig5a_gain_composition.png",
+        "paper_fig5b_residual_ml_lift.png",
         "paper_fig6_model_support.png",
         "paper_fig7_sensitivity.png",
         "fig:dispatch_architecture",
         "fig:matching_ball",
         "fig:dispatch_density",
         # fig:cross_domain removed with paper_fig4
-        "fig:single_driver_density",
+        "fig:single_driver_gain_comp",
+        "fig:single_driver_residual",
         "fig:model_support",
         "fig:sensitivity",
         "matching-ball",
         "Disk}_1(h)",
         "retrieved corridor candidates",
         "dispatch-available",
+        "same-city service-type",
+        "External public-data audit",
+        "Boston, Philadelphia, Dallas, and Houston",
+        "retained-sample sensitivity",
+        "Feature dictionary",
+        "Eligibility-rule ablation",
+        "Cached end-to-end route-scoring",
+        "runtime-resource",
+        "Code and Reproducibility",
+        "commands used to regenerate the main results",
     ]
     for snippet in required_snippets:
         if snippet not in manuscript:
@@ -331,6 +591,39 @@ def validate_paper_package(
         value_snippets.extend([
             f"{float(dispatch_rows['yellow_warmup']['mean_eval_time_s_mean']) * 1000:.1f}",
             f"{float(dispatch_rows['yellow_warmup']['mean_batch_runtime_s_mean']) * 1000:.1f}",
+        ])
+    value_snippets.extend([
+        f"Mean ms & {fmt_ms(mean_runtime['cache_lookup_s'])} & {fmt_ms(mean_runtime['corridor_build_s'])} & {fmt_ms(mean_runtime['candidate_filter_and_match_s'])} & {fmt_ms(mean_runtime['end_to_end_cached_s'])}",
+        f"Median ms & {fmt_ms(median_runtime['cache_lookup_s'])} & {fmt_ms(median_runtime['corridor_build_s'])} & {fmt_ms(median_runtime['candidate_filter_and_match_s'])} & {fmt_ms(median_runtime['end_to_end_cached_s'])}",
+        f"Max ms & {fmt_ms(max_runtime['cache_lookup_s'])} & {fmt_ms(max_runtime['corridor_build_s'])} & {fmt_ms(max_runtime['candidate_filter_and_match_s'])} & {fmt_ms(max_runtime['end_to_end_cached_s'])}",
+        f"{float(osrm['mean_latency_s']):.2f} s",
+        f"{float(osrm['median_latency_s']):.2f} s",
+        f"mean {float(osrm['mean_route_count']):.1f} returned alternatives",
+        f"has {int(float(mean_runtime['route_cache_entries']))} route entries",
+        f"{float(runtime_resource['route_cache_file_mb']):.1f} MB SQLite route-cache footprint",
+        f"{float(runtime_resource['avg_route_payload_kb']):.1f} kB average route payload",
+        f"{float(runtime_resource['traced_peak_single_lookup_mb']):.2f} MB traced Python allocation",
+    ])
+    for model_name in ("Ridge", "MLP", "LightGBM baseline", "LightGBM tuned", "LambdaRank"):
+        row = model_policy_by_name[model_name]
+        value_snippets.append(
+            f"{model_name} & {float(row['policy_profit_per_driver']):.2f} & {float(row['rank1_accuracy']) * 100:.1f}\\%"
+        )
+    greedy_baseline = stronger_baseline_by_name["greedy_nearest_route_dispatch"]
+    batch_baseline = stronger_baseline_by_name["batch_bipartite_single_rider"]
+    value_snippets.extend([
+        f"\\(-\\${abs(float(greedy_baseline['profit_per_driver'])):.2f}\\) per driver and {float(greedy_baseline['matched_riders_per_driver']):.2f} matched riders per driver",
+        f"\\(-\\${abs(float(batch_baseline['profit_per_driver'])):.2f}\\) per driver and {float(batch_baseline['matched_riders_per_driver']):.2f} matched riders per driver",
+    ])
+    for key, coldstart_field, path_field in (
+        (("dispatch", "10"), "coldstart_profit", "path_buffer_profit"),
+        (("single_driver", "25"), "coldstart_profit", "path_buffer_profit"),
+        (("single_driver", "10"), "coldstart_profit", "path_buffer_profit"),
+    ):
+        row = path_buffer_by_key[key]
+        value_snippets.extend([
+            f"\\${abs(float(row[coldstart_field])):.2f}",
+            f"\\${abs(float(row[path_field])):.2f}",
         ])
     for snippet in value_snippets:
         if snippet not in manuscript:

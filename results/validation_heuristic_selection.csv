@@ -1,0 +1,6 @@
+heuristic,mean_profit,mean_matched_riders,drivers_evaluated,rank_by_validation_profit,selected_on_validation,sample_scope,density_pct,seed,note
+heuristic_fare_density,-5.748762142658896,0.5666666666666667,30,1,True,march_yellow_validation_probe,10,2026,Validation probe used to pre-select the non-ML heuristic before April test interpretation.
+heuristic_feasible_count,-5.922399389397725,0.5666666666666667,30,2,False,march_yellow_validation_probe,10,2026,Validation probe used to pre-select the non-ML heuristic before April test interpretation.
+heuristic_count,-6.0775131834582306,0.5666666666666667,30,3,False,march_yellow_validation_probe,10,2026,Validation probe used to pre-select the non-ML heuristic before April test interpretation.
+heuristic_profit_proxy,-6.137264779350542,0.5,30,4,False,march_yellow_validation_probe,10,2026,Validation probe used to pre-select the non-ML heuristic before April test interpretation.
+heuristic_path_buffer,-6.399326949764086,0.5333333333333333,30,5,False,march_yellow_validation_probe,10,2026,Validation probe used to pre-select the non-ML heuristic before April test interpretation.

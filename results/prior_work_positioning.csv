@@ -1,0 +1,7 @@
+literature_family,reused_or_related_idea,paper_specific_contribution,scope_boundary
+T-Share / dynamic taxi ridesharing,spatiotemporal indexing and dynamic matching,public-data route-corridor exposure with exact post-retrieval eligibility,We do not reproduce T-Share fleet optimization; we compare the retrieval primitive and dispatch-lite layer.
+Shareability networks,compatibility under time/delay windows,route-specific candidate-pool construction over OSRM alternatives,"Shareability is an inspiration, not a direct baseline."
+Dynamic trip-vehicle assignment,global assignment over requests and vehicles,low-latency route-choice layer before assignment,Our simulator is not a replacement for full RTV/global optimization.
+Rolling-horizon dispatch studies,batching and online reassignment,60-second shared-request route-choice evaluation,We add rider exclusivity but not repositioning or long-horizon fleet control.
+Path-buffer/geometric retrieval,simple route-neighborhood exposure,H3 pickup-and-drop-off corridor eligibility plus exact timing,Now included as a bounded sanity baseline.
+Learning-based dispatch/ranking,ML value estimation or order assignment,learned route ranking after explicit candidate construction,"ML is a residual scorer, not the primary source of lift."

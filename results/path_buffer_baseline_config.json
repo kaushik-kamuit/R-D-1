@@ -1,0 +1,40 @@
+{
+  "domain": "yellow",
+  "driver_sample_size": 1000,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "single_driver_densities": [
+    25,
+    10
+  ],
+  "dispatch_densities": [
+    10
+  ],
+  "request_window_min": 5,
+  "max_detour_min": 4.0,
+  "batch_seconds": 60,
+  "sample_scope": "live_or_cached_routes",
+  "single_driver_coverage": {
+    "cache_only": false,
+    "requested_driver_sample": 1000,
+    "available_test_drivers": 668476,
+    "available_test_riders": 2759327,
+    "selected_driver_sample": 1000,
+    "single_driver_routed_drivers": 1000
+  },
+  "dispatch_coverage": {
+    "cache_only": false,
+    "requested_driver_sample": 1000,
+    "available_test_drivers": 668476,
+    "available_test_riders": 2759327,
+    "selected_driver_sample": 1000,
+    "dispatch_driver_sample": 1000
+  },
+  "generated_at": "2026-05-23T16:51:06.195636+00:00",
+  "elapsed_s": 2098.3774766921997
+}

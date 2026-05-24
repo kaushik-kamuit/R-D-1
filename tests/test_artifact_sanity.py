@@ -9,8 +9,16 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from data_prep.domain_config import get_domain_config
+
 
 class ArtifactSanityTests(unittest.TestCase):
+    def test_yellow_prefers_domain_specific_route_cache_when_present(self) -> None:
+        config = get_domain_config("yellow")
+        domain_cache = ROOT / "data" / "route_cache_yellow.db"
+        if domain_cache.exists():
+            self.assertEqual(config.route_cache_path, domain_cache)
+
     def test_selected_heuristic_is_best_non_ml_per_density(self) -> None:
         df = pd.read_csv(ROOT / "results" / "strong_baseline_comparison.csv")
         for density, group in df.groupby("density_pct"):

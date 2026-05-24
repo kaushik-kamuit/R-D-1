@@ -1,0 +1,7 @@
+role,threshold,retained_rows,estimated_rows_before_presample,observability_note
+driver,trip_distance_miles > 8,,,Not observable from the processed driver file because it stores only >10 mile trips; requires raw-data rerun.
+driver,trip_distance_miles > 10,2468795.0,,Exact count from processed driver file.
+driver,trip_distance_miles > 12,1630274.0,,Exact count from processed driver file.
+rider,0.5 <= trip_distance_miles <= 8,10539978.0,42159912.0,Estimated from the checked-in 25% retained rider sample.
+rider,0.5 <= trip_distance_miles <= 10,10844032.0,43376128.0,Estimated from the checked-in 25% retained rider sample.
+rider,0.5 <= trip_distance_miles <= 12,,,Not observable from the processed rider file because it stores only the 0.5-10 mile retained sample; requires raw-data rerun.

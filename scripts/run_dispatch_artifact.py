@@ -345,7 +345,7 @@ def _write_dispatch_public_outputs(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the rolling dispatch artifact and public-domain robustness study")
+    parser = argparse.ArgumentParser(description="Run the rolling dispatch artifact and same-city service-type robustness study")
     parser.add_argument("--sample", type=int, default=1000, help="Test-driver sample for dispatch runs (paper headline default)")
     parser.add_argument("--seeds", type=int, default=5, help="Number of seeds (default 5)")
     parser.add_argument("--skip-green", action="store_true", help="Skip the Green robustness run")

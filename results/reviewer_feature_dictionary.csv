@@ -1,0 +1,39 @@
+feature_family,feature,definition,source,time_of_availability,aggregation_window,uses_realized_test_outcome
+Route geometry,route_distance_m,OSRM route distance in meters.,OSRM route,dispatch time,per route,No
+Route geometry,route_duration_s,OSRM route duration in seconds.,OSRM route,dispatch time,per route,No
+Route geometry,corridor_cell_count,Number of H3 cells in the expanded route corridor.,corridor builder,dispatch time,per route,No
+Temporal context,hour_of_day,Driver departure hour.,driver request,dispatch time,instantaneous,No
+Temporal context,day_of_week,Driver departure weekday index.,driver request,dispatch time,instantaneous,No
+Temporal context,is_weekend,Weekend indicator.,driver request,dispatch time,instantaneous,No
+Online corridor demand,corridor_rider_count,Exact-window riders retrieved in the route corridor.,rider index,dispatch time,open requests,No
+Online corridor demand,corridor_demand_density,Exact-window rider count divided by corridor cell count.,rider index,dispatch time,open requests,No
+Online corridor demand,mean_rider_fare,Mean fare among exact-window corridor candidates.,rider index,dispatch time,open requests,No
+Online corridor demand,corridor_fare_density,Candidate fare sum divided by corridor cell count.,rider index,dispatch time,open requests,No
+Temporal context,day_of_month,Calendar day of the month.,driver request,dispatch time,instantaneous,No
+Temporal context,time_bin_15min,Quarter-hour departure bin.,driver request,dispatch time,instantaneous,No
+Temporal context,hour_sin,Cyclic sine encoding of departure hour.,driver request,dispatch time,instantaneous,No
+Temporal context,hour_cos,Cyclic cosine encoding of departure hour.,driver request,dispatch time,instantaneous,No
+Route geometry,route_sinuosity,Route distance divided by straight-line OD distance.,OSRM route,dispatch time,per route,No
+Route geometry,route_avg_speed_ms,Route distance divided by OSRM duration.,OSRM route,dispatch time,per route,No
+Route geometry,bearing_sin,Cyclic sine encoding of OD bearing.,driver OD,dispatch time,per route,No
+Route geometry,bearing_cos,Cyclic cosine encoding of OD bearing.,driver OD,dispatch time,per route,No
+Route geometry,straight_line_dist_m,Haversine distance between driver origin and destination.,driver OD,dispatch time,per route,No
+Landmark/cell context,origin_landmark_dist_km,Minimum distance from origin to named NYC landmarks.,driver OD,dispatch time,static,No
+Landmark/cell context,dest_landmark_dist_km,Minimum distance from destination to named NYC landmarks.,driver OD,dispatch time,static,No
+Landmark/cell context,origin_jfk_km,Origin distance to JFK airport.,driver OD,dispatch time,static,No
+Landmark/cell context,origin_lga_km,Origin distance to LGA airport.,driver OD,dispatch time,static,No
+Landmark/cell context,origin_penn_km,Origin distance to Penn Station.,driver OD,dispatch time,static,No
+Landmark/cell context,origin_times_sq_km,Origin distance to Times Square.,driver OD,dispatch time,static,No
+Landmark/cell context,dest_jfk_km,Destination distance to JFK airport.,driver OD,dispatch time,static,No
+Landmark/cell context,dest_lga_km,Destination distance to LGA airport.,driver OD,dispatch time,static,No
+Landmark/cell context,dest_penn_km,Destination distance to Penn Station.,driver OD,dispatch time,static,No
+Landmark/cell context,dest_times_sq_km,Destination distance to Times Square.,driver OD,dispatch time,static,No
+Historical spatial demand,corridor_hist_pickups,Historical pickup count in route corridor.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,corridor_hist_dropoffs,Historical drop-off count in route corridor.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,corridor_hist_pickup_density,Historical pickup density in route corridor.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,corridor_hist_dropoff_density,Historical drop-off density in route corridor.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,corridor_hist_mean_fare,Historical mean fare in route corridor.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,corridor_hist_fare_density,Historical fare density in route corridor.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,origin_cell_pickups,Historical pickup count in origin H3 cell.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,origin_cell_mean_fare,Historical mean fare in origin H3 cell.,training history,precomputed before evaluation month,Jan-Mar history,No
+Historical spatial demand,dest_cell_dropoffs,Historical drop-off count in destination H3 cell.,training history,precomputed before evaluation month,Jan-Mar history,No

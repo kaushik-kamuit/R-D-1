@@ -44,9 +44,12 @@ class DomainConfig:
 
     @property
     def route_cache_path(self) -> Path:
+        domain_cache = ROOT / "data" / f"route_cache_{self.name}.db"
+        if domain_cache.exists():
+            return domain_cache
         if self.legacy_route_cache_path and self.legacy_route_cache_path.exists():
             return self.legacy_route_cache_path
-        return ROOT / "data" / f"route_cache_{self.name}.db"
+        return domain_cache
 
     def raw_month_path(self, month: int) -> Path:
         new_path = self.raw_dir / f"{self.raw_filename_prefix}_{YEAR}-{month:02d}.parquet"

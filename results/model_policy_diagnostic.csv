@@ -1,0 +1,8 @@
+model,policy_profit_per_driver,rank1_accuracy,drivers_evaluated,r2,rmse,sample_scope,density_pct,seed,note
+Cold-start default,-7.656230918678879,0.5476190476190477,42,,,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.
+Oracle route set,-6.184367194004996,1.0,42,,,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.
+Ridge,-6.584492089925063,0.8571428571428571,42,0.5446735620498657,3.4323472677926445,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.
+MLP,-6.821165893501447,0.8095238095238095,42,0.42006808519363403,3.8736315125829766,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.
+LightGBM baseline,-7.112204115617939,0.7380952380952381,42,0.5587378827170354,3.3789215944850137,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.
+LightGBM tuned,-6.627672376194441,0.7142857142857143,42,0.543051934386453,3.438453960791858,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.
+LambdaRank,-7.411326870465088,0.8333333333333334,42,,,cached_multiroute_april_yellow_route_policy_diagnostic,10,42,Held-out cached route-choice diagnostic; narrower than full rolling dispatch.

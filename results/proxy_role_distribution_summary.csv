@@ -1,0 +1,5 @@
+split,proxy_role,retained_rows,distance_min,distance_p25,distance_median,distance_p75,distance_max,retained_sample_semantics
+train,driver,1800319,10.01,11.31,14.5,17.8,100.0,Trips longer than 10 miles
+train,rider,8084705,0.5,1.12,1.77,2.97,10.0,25% sample of eligible 0.5-10 mile trips
+test,driver,668476,10.01,11.31,14.6,17.81,96.0,Trips longer than 10 miles
+test,rider,2759327,0.5,1.16,1.8,3.02,10.0,25% sample of eligible 0.5-10 mile trips

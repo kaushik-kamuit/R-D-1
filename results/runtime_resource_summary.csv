@@ -1,0 +1,2 @@
+route_cache_entries,route_cache_file_mb,sqlite_page_footprint_mb,avg_route_payload_kb,max_route_payload_kb,sample_route_payload_kb,traced_peak_single_lookup_mb,drivers_profiled,profiled_cache_hits,profiled_cache_misses,mean_cached_total_ms,max_cached_total_ms,live_osrm_requests,live_osrm_mean_latency_s,live_osrm_median_latency_s
+1000,23.109375,23.109375,22.7740908203125,65.951171875,16.40625,0.12626075744628906,100,240,156186,13.117629988119,66.2127998657524,5,1.6756801199866458,1.7832472999580204
