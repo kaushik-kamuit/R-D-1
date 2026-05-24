@@ -1,10 +1,10 @@
-# Does Route Choice Matter in Ride-Pooling Dispatch?
+# Route-Aware Ride-Pooling Dispatch via Spatiotemporal Corridor Matching
 
-This repository contains the public release for our study of route-aware ride-pooling on public NYC taxi data. The codebase includes the matching-ball retrieval engine, route-ranking models, the rolling-horizon dispatch workflow, checked-in result summaries, publication figures, and the manuscript package used for submission.
+This repository contains the research artifact for a study of route-aware ride-pooling on public NYC taxi data. The codebase includes the matching-ball retrieval engine, route-ranking models, the rolling-horizon dispatch workflow, checked-in result summaries, publication figures, and the manuscript package.
 
 The central question is simple:
 
-> If a platform evaluates a small set of genuine road-network alternatives before committing a driver to a route, does route choice materially change which riders are realistically matchable and what dispatch outcome the platform achieves?
+> If a platform evaluates a small set of genuine road-network alternatives before committing a driver to a route, does route choice change which riders are matchable and what dispatch outcome the platform achieves?
 
 <p align="center">
   <img src="results/plots/paper_fig1_dispatch_architecture_v2.png" alt="Dispatch-first system architecture" width="88%">
@@ -12,14 +12,14 @@ The central question is simple:
 
 ## Why This Repository Exists
 
-Most ride-pooling pipelines treat route choice as a routing detail and study matching only after the default route has already been fixed. This repository studies a narrower but operationally meaningful alternative: route choice itself changes the candidate pool that the platform can see and serve.
+Most ride-pooling pipelines treat route choice as a routing detail and study matching only after the default route has already been fixed. This repository studies a narrower alternative: route choice itself changes the candidate pool that the platform can see and serve.
 
 The artifact is built around four methodological commitments:
 
 - route alternatives must be genuine road-network alternatives rather than synthetic geometry perturbations
 - retrieval speed and matching eligibility should be separated, so coarse index bins do not become the de facto matching rule
 - route value should be tested both in isolated single-driver evaluation and in shared rolling dispatch
-- public release assets should be strong enough for both paper review and repository-based inspection
+- public release assets should support both paper review and repository-based inspection
 
 In concrete terms, the system:
 
@@ -34,7 +34,7 @@ In concrete terms, the system:
 
 - a controlled single-driver route-choice study for mechanism isolation
 - a rolling-horizon multi-driver dispatch study for system-level evidence
-- checked-in summary tables for the paper’s headline claims
+- checked-in summary tables for the paper's headline claims
 - publication-facing figures for GitHub and manuscript use
 - a standalone IEEE-style manuscript package under `paper/`
 
@@ -52,12 +52,12 @@ The headline submission snapshot is summarized below.
 
 These numbers support four main conclusions:
 
-- route-aware dispatch materially improves on default cold-start routing
+- route-aware dispatch reduces loss relative to default cold-start routing
 - the largest share of the gain comes from route-aware candidate construction and strong heuristics
 - the learned scorer retains a smaller but consistent edge over the best heuristic
-- exact request-window assumptions are methodologically important and materially affect the measured result
+- exact request-window assumptions affect the measured result
 
-The paper’s intended claim is therefore not that ML dramatically dominates dispatch. The stronger claim is that route-aware retrieval changes the feasible rider set in the first place, and that this change survives into rolling dispatch outcomes under realistic timing rules.
+The paper's intended claim is therefore not that ML dominates dispatch. The central claim is that route-aware retrieval changes the feasible rider set before route ranking, and that this change survives into rolling dispatch outcomes under exact timing rules.
 
 ## Visual Walkthrough
 

@@ -1,6 +1,6 @@
 # Paper Package
 
-This directory contains the standalone IEEE journal-style manuscript package for the dispatch-first, realism-aware NYC route-selection study.
+This directory contains the standalone IEEE journal-style manuscript package for the route-aware ride-pooling dispatch study.
 
 ## Files
 
@@ -57,7 +57,7 @@ That folder contains:
 
 ## Result anchors
 
-The manuscript narrative is anchored to the dispatch-first and realism-first result files under `../results/`, especially:
+The manuscript narrative is anchored to the dispatch and route-choice result files under `../results/`, especially:
 
 - `../results/dispatch_yellow_primary.csv`
 - `../results/dispatch_green_primary.csv`

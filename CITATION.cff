@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this repository, please cite it using the metadata below."
-title: "Route-Aware Matching-Ball Dispatch for Ride-Pooling"
+title: "Route-Aware Ride-Pooling Dispatch via Spatiotemporal Corridor Matching"
 type: software
 authors:
   - family-names: "Kaushik"
